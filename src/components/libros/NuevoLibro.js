@@ -8,7 +8,7 @@ import { PostLibro, GetPersonas } from "../ApiHandler";
 import InputGroup from "react-bootstrap/InputGroup";
 import Swal from "sweetalert2";
 
-const ModalNuevaPersona = ({ type, setPerson, person }) => {
+export const ModalNuevaPersona = ({ type, setPerson, person }) => {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);

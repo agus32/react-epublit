@@ -214,46 +214,23 @@ const columns = [
 const ExpandedComponent = ({ data }) => {
   const [loading, setLoading] = useState(true);
   const [consignacion, setConsignacion] = useState(null);
-  const [path, setPath] = useState(null);
 
   useEffect(() => {
-    fetchConsignaciones(); // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.id]);
-
-  const fetchConsignaciones = async () => {
-    try {
-      const cons = await GetConsignacionByID(data.id);
-      setConsignacion(cons);
-
-      setLoading(false);
-      getPath(cons);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-    }
-  };
-
-  const getPath = (consignacion) => {
-    console.log(
-      "archivo: ",
-      `../../comprobantes/remitos/${consignacion.remito_path}`
-    );
-
-    if (consignacion != null) {
+    const fetchConsignaciones = async () => {
       try {
-        console.log(
-          "archivo: ",
-          `../../comprobantes/remitos/${consignacion.remito_path}`
-        );
-        setPath(
-          require(`../../comprobantes/remitos/${consignacion.remito_path}`)
-        );
-      } catch (e) {
-        console.log("no hay archivo");
-        console.log(e);
+        const cons = await GetConsignacionByID(data.id);
+        setConsignacion(cons);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
       }
-    }
-  };
+      setLoading(false);
+    };
+    
+    fetchConsignaciones();
+  }, [data]);
+
+  
 
   if (loading) {
     return (
@@ -273,7 +250,7 @@ const ExpandedComponent = ({ data }) => {
             </tr>
           </thead>
           <tbody>
-            {consignacion.libros.map((fila) => (
+          {consignacion.libros?.map((fila) => (
               <tr key={fila.isbn}>
                 <td>{fila.isbn}</td>
                 <td>{fila.titulo}</td>
@@ -282,7 +259,7 @@ const ExpandedComponent = ({ data }) => {
             ))}
           </tbody>
         </Table>
-        <Button variant="success" onClick={() => window.open(path, "_blank")}>
+        <Button variant="success" onClick={() => window.open(consignacion.remito_path, "_blank")}>
           Remito
         </Button>
       </div>

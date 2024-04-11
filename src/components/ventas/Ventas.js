@@ -49,6 +49,7 @@ const handleSeleccionadoAdd = (event) => {
           parseInt(event.target.cliente.value),
           parseFloat(event.target.descuento.value),
           parseInt(event.target.medio_pago.value),
+          parseInt(event.target.tipo_cbte.value),
           listaLibros
         );
         event.target.reset();
@@ -80,6 +81,15 @@ const handleSeleccionadoAdd = (event) => {
             {medioPago.map((medio,index) => (
                 <option key={index} value={index}>{medio}</option>
             ))}
+          </Form.Select>
+        </Form.Group>
+        <Form.Group as={Col} controlId="tipo_cbte">
+          <Form.Label>Tipo de Factura</Form.Label>
+          <Form.Select>
+            <option key={1} value={1}>Factura A</option>
+            <option key={6} value={6}>Factura B</option>
+            <option key={11} value={11}>Factura C</option>
+            <option key={51} value={51}>Factura M</option>
           </Form.Select>
         </Form.Group>
       </Row>
@@ -226,46 +236,29 @@ const columns =(medioDePago) =>([
 const ExpandedComponent = ({ data }) => {
   const [loading, setLoading] = useState(true);
   const [ventas, setVentas] = useState(null);
-  const [path, setPath] = useState(null);
 
+ 
   useEffect(() => {
-          fetchVentas();// eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [data.id]);
-
-  const fetchVentas = async () => {
+    const fetchVentas = async () => {
       try {
           const venta = await GetVentaById(data.id);
-          setVentas(venta);
-          
-          setLoading(false);
-          getPath(venta);
-          
+          setVentas(venta);     
       } catch (error) {
           console.error(error);
-          setLoading(false);
       }
-  };
-  
-  
-  const getPath = (venta)=> {
-    
-    if(venta != null){
-      try{
-        console.log("archivo: ", `../../comprobantes/facturas/${venta.file_path}`)
-        setPath(require(`../../comprobantes/facturas/${venta.file_path}`));
-      }catch(e){
-        console.log("no hay archivo");
-        console.log(e);
-      }
-    } 
-    
-  }
+      setLoading(false);
+    };
+
+    fetchVentas();
+
+   }, [data]);
+
 
   
   if(loading){
     return (
       <Spinner animation="border" role="status">
-        <span className="visually-hidden">Loading...</span>
+        <span className="visually-hidden">Cargando...</span>
       </Spinner>
     );
   }
@@ -282,7 +275,7 @@ const ExpandedComponent = ({ data }) => {
           </tr>
       </thead>
       <tbody>
-          {ventas.libros.map(fila=>(
+          {ventas.libros?.map(fila=>(
               <tr key={fila.isbn}>
               <td>{fila.isbn}</td>
               <td>{fila.titulo}</td>
@@ -294,7 +287,7 @@ const ExpandedComponent = ({ data }) => {
           
       </tbody>
       </Table>
-      <Button variant="success" onClick={() => window.open(path, '_blank')}>Factura</Button>
+      <Button variant="success" onClick={() => window.open(ventas.file_path, '_blank')}>Factura</Button>
       </div>
   );
   }

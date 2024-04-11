@@ -8,7 +8,14 @@ export const Login = () => {
     <div className="bdy">
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand href="/">Libros Silvestres</Navbar.Brand>
+          <Navbar.Brand href="/">
+            <img
+              alt="epublit logo"
+              src={require("../../media/epublit_logo.png")}
+              height="35"
+              className="d-inline-block align-top"
+            />
+          </Navbar.Brand>
         </Container>
       </Navbar>
       <div className="sign-in-box">

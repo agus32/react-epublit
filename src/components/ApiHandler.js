@@ -1,6 +1,7 @@
-const HOST = process.env.REACT_APP_HOST;
-const API_PORT = process.env.REACT_APP_API_PORT;
 import Swal from "sweetalert2";
+const HOST = "http://epublit.com.ar/api/v1";
+
+
 
 let TOKEN = "";
 
@@ -9,16 +10,24 @@ export const setToken = (token) => {
 };
 
 const handleAlert = (message, type) => {
-  const title = type === "success" ? "Exito" : "Error";
+
+  let formattedMessage = message;
+
+  if (typeof message === "object") { 
+    const messageErrors = message.map(error => error.message);
+    formattedMessage = messageErrors.join("\n");
+  }
+
+  const title = type === "success" ? "Éxito" : "Error";
   Swal.fire({
     title: title,
-    text: message,
+    text: formattedMessage,
     icon: type,
   });
 };
 
 export const fetchData = async (endpoint, method, body = null) => {
-  const URL = `${HOST}:${API_PORT}/${endpoint}`;
+  const URL = `${HOST}/${endpoint}`;
   const headers = {
     Authorization: TOKEN,
     "Content-type": "application/json; charset=UTF-8",
@@ -36,9 +45,10 @@ export const fetchData = async (endpoint, method, body = null) => {
   try {
     const response = await fetch(URL, requestOptions);
     const data = await response.json();
-    response.ok
-      ? handleAlert(data.message, "success")
-      : handleAlert(data.error, "error");
+    if(response.ok){
+      if(method !== "GET") handleAlert(data.message, "success");
+    }else handleAlert(data.errors ?? data.error, "error");
+
 
     return data;
   } catch (error) {

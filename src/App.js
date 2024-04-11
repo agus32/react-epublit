@@ -15,11 +15,24 @@ import { ShowConsignaciones } from "./components/consignaciones/Consignaciones";
 
 const Home = () => (
   <div className="bdy">
-    <span className="title">Libros Silvestres</span>
+    <span className="title">Epublit</span>
   </div>
 );
 
-const LoggedInRender = () => (
+const AppRender = () => {
+  const { user, loading } = usePerson();
+
+  if (loading) {
+    return (
+      <Spinner className="loading-spinner" animation="border" role="status" />
+    );
+  }
+
+  if(Object.keys(user).length === 0){
+    return <Login />
+  }
+
+  return(
   <div className="App">
     <NavBar />
     <Routes>
@@ -33,19 +46,13 @@ const LoggedInRender = () => (
       <Route path="/consignaciones" element={<ShowConsignaciones />} />
     </Routes>
   </div>
-);
+  ); 
+};
 
 function App() {
-  const { user, loading } = usePerson();
-
-  if (loading) {
-    return (
-      <Spinner className="loading-spinner" animation="border" role="status" />
-    );
-  }
   return (
     <PersonProvider>
-      {user != {} ? <LoggedInRender /> : <Login />}
+      <AppRender />
     </PersonProvider>
   );
 }
