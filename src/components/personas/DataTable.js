@@ -4,6 +4,7 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import { DeletePerson } from "../ApiHandler";
+import Swal from "sweetalert2";
 
 const FilterComponent = ({ filterText, onFilter, onClear }) => (
   <InputGroup>
@@ -53,24 +54,26 @@ export const DataPersonTable = ({ data, setPeople, type }) => {
       item.nombre &&
       item.nombre.toLowerCase().includes(filterText.toLowerCase())
   );
-  const contextActions = React.useMemo(() => {
-    const handleDelete = () => {
-      if (
-        window.confirm(
-          `Estas seguro que quieres borrar:\r ${selectedRows.map(
-            (r) => r.nombre
-          )}?`
-        )
-      ) {
+  const contextActions = React.useMemo(() => { // utilizo useMemo porque estaba en el ejemplo de la documentación, por lo que entiendo , evita que se renderice cada vez que se actualiza algo que no este en las dependencias
+    const handleDelete = () =>{
+    Swal.fire({
+      title: "Estas seguro que quieres borrar:",
+      text: `${selectedRows.map((r) => r.nombre )}?`,
+      showCancelButton: true,
+      confirmButtonText: "Aceptar",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
         setToggleCleared(!toggleCleared);
         setPeople(data.filter((r) => !selectedRows.includes(r)));
-        selectedRows.map((r) => DeletePerson(r.id));
+        selectedRows.forEach((r) => DeletePerson(r.id))
       }
+    })
     };
 
     return (
       <Button key="delete" onClick={handleDelete} variant="danger">
-        Delete
+        Eliminar
       </Button>
     );
   }, [data, selectedRows, toggleCleared, setPeople]);

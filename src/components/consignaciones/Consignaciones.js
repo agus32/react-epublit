@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {Button,Col,Row,Form,Spinner,Table,InputGroup} from "react-bootstrap";
 import {PostConsignacion,GetConsignacionByID,GetClientes,GetLibros,GetConsignaciones} from "../ApiHandler";
-import { formatDate } from "../libros/ListaLibros";
+import { formatDate } from "../utils";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
 
@@ -30,13 +30,27 @@ export const ConsignacionesForm = ({ clientes, libros }) => {
         icon: "warning",
       });
     } else {
-      setLibrosSeleccionados([
-        ...librosSeleccionados,
-        {
-          cantidad: inputs.cantidad,
-          libro: libros.find((libro) => inputs.libro === libro.isbn),
-        },
-      ]);
+      const existingBook = librosSeleccionados.find(
+        (item) => item.libro.isbn === inputs.libro
+      );
+  
+      if (existingBook) {
+        const updatedLibrosSeleccionados = librosSeleccionados.map((item) =>
+          item.libro.isbn === existingBook.libro.isbn
+            ? { ...item, cantidad: item.cantidad + parseInt(inputs.cantidad) }
+            : item
+        );
+        setLibrosSeleccionados(updatedLibrosSeleccionados);
+      } else {
+        setLibrosSeleccionados([
+          ...librosSeleccionados,
+          {
+            cantidad: parseInt(inputs.cantidad),
+            libro: libros.find((libro) => libro.isbn === inputs.libro),
+          },
+        ]);
+      }
+
       setInputs({ libro: "", cantidad: "" });
     }
   };
@@ -49,12 +63,9 @@ export const ConsignacionesForm = ({ clientes, libros }) => {
         cantidad: parseInt(libro.cantidad),
       };
     });
-    const consignacion = JSON.stringify({
-      cliente: parseInt(event.target.cliente.value),
-      libros: listaLibros,
-    });
 
-    PostConsignacion(consignacion);
+    PostConsignacion(parseInt(event.target.cliente.value),listaLibros);
+    console.log(listaLibros);
     event.target.reset();
     setLibrosSeleccionados([]);
   };

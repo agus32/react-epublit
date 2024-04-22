@@ -19,7 +19,7 @@ export const ModalNuevaPersona = ({ type, setPerson, person }) => {
   const handleChange = (event) => {
     const name = event.target.name;
     const value =
-      name === "dni" || name === "porcentaje"
+      name === "porcentaje"
         ? parseInt(event.target.value)
         : event.target.value;
     setInputs((values) => ({ ...values, [name]: value }));
@@ -96,7 +96,7 @@ export const ModalNuevaPersona = ({ type, setPerson, person }) => {
   );
 };
 
-export function ModalPersonaExistente({ options, onSave, type }) {
+export const ModalPersonaExistente = ({ options, onSave, type }) => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -113,8 +113,8 @@ export function ModalPersonaExistente({ options, onSave, type }) {
     if (selectedOption !== -1) {
       const option = options.find((option) => option.id === selectedOption);
       option.porcentaje = parseInt(selectedPorcentaje);
-      if (type === "Autor") option.tipo = 0;
-      else option.tipo = 1;
+      if (type === "Autor") option.tipo = "autor";
+      else option.tipo = "ilustrador";
 
       onSave(option);
     }
@@ -238,17 +238,17 @@ const NuevoLibro = ({ personas }) => {
     event.preventDefault();
     const listaAutores = autores.concat(
       selectedAuthors.map((item) => ({
-        id: item.id,
+        id_persona: item.id,
         porcentaje: item.porcentaje,
       }))
     );
     const listaIlustradores = ilustradores.concat(
       selectedIlustrators.map((item) => ({
-        id: item.id,
+        id_persona: item.id,
         porcentaje: item.porcentaje,
       }))
     );
-    const libro = JSON.stringify({
+    const libro = {
       titulo: event.target.titulo.value,
       isbn: event.target.isbn.value,
       fecha_edicion: event.target["fecha-edicion"].value,
@@ -256,7 +256,7 @@ const NuevoLibro = ({ personas }) => {
       stock: parseInt(event.target.stock.value),
       autores: listaAutores,
       ilustradores: listaIlustradores,
-    });
+    };
     PostLibro(libro);
     event.target.reset();
     setAutores([]);

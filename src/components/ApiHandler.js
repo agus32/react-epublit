@@ -122,8 +122,8 @@ export const GetStockById = async (id) => {
   return fetchData(`cliente/${id}/stock`, "GET");
 };
 
-export const PostVenta = async (cliente, descuento, medio_pago, libros) => {
-  return fetchData("venta", "POST", { cliente, descuento, medio_pago, libros });
+export const PostVenta = async (cliente, descuento, medio_pago,tipo_cbte, libros) => {
+  return fetchData("venta", "POST", { cliente, descuento, medio_pago,tipo_cbte, libros });
 };
 
 export const PostLibro = async (inputs) => {
@@ -142,13 +142,13 @@ export const PostCliente = async (inputs) => {
   return fetchData("cliente", "POST", inputs);
 };
 
-export const PostConsignacion = async (inputs) => {
-  return fetchData("consignacion", "POST", inputs);
+export const PostConsignacion = async (cliente,libros) => {
+  return fetchData("consignacion", "POST", {cliente,libros});
 };
 
 export const DeletePersonFromBook = async ({ isbn, id, type }) => {
   const content = {
-    id: id,
+    id_persona: id,
     tipo: type,
   };
 

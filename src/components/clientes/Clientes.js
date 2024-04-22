@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { DeleteCliente, PutCliente, PostCliente,GetVentas,GetVentaById,GetStockById,GetClientes} from '../ApiHandler';
 import { Modal, Button, Form , InputGroup,Row,Col,Table, Spinner} from 'react-bootstrap';
-import { formatDate } from "../libros/ListaLibros";
+import { formatDate } from "../utils";
+
+
+const TipoClienteDefault = "inscripto";
 
 const Clientes = ({ clientes, setClientes }) => {
   const [filterText, setFilterText] = useState("");
@@ -114,22 +117,16 @@ const columns = (handleButtonClick, handleDeleteCliente) => [
   },
 ];
 
-const ModalEditarClientes = ({
-  cliente,
-  setClientes,
-  show,
-  setShow,
-  clientes,
-}) => {
+const ModalEditarClientes = ({cliente,setClientes,show,setShow,clientes}) => {
   const handleClose = () => setShow(false);
   const id = cliente.id;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const edit = JSON.stringify({
+    const edit = {
       nombre: event.target.nombre.value,
       email: event.target.email.value,
-    });
+    };
     handleClose();
     const response = await PutCliente({ edit, id });
     if (response.success) {
@@ -185,12 +182,12 @@ const ModalEditarClientes = ({
 const AltaClienteForm = ({ setClientes, clientes }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const cliente = JSON.stringify({
+    const cliente = {
       nombre: event.target.nombre.value,
       email: event.target.email.value,
       cuit: event.target.cuit.value,
-      tipo: 1,
-    });
+      tipo: TipoClienteDefault,
+    };
 
     const response = await PostCliente(cliente);
     if (response.success) {

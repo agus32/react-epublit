@@ -34,8 +34,14 @@ export const NavBar = () => {
 
             <Nav.Link href="ventas">Ventas</Nav.Link>
             <Nav.Link href="clientes">Clientes</Nav.Link>
-            <Nav.Link href="autores">Autores</Nav.Link>
-            <Nav.Link href="ilustradores">Ilustradores</Nav.Link>
+            <NavDropdown title="Personas" id="collasible-nav-dropdown">
+              <NavDropdown.Item href="autores">
+                Autores
+              </NavDropdown.Item>
+              <NavDropdown.Item href="ilustradores">
+                Ilustradores
+              </NavDropdown.Item>
+            </NavDropdown>
             <Nav.Link href="consignaciones">Consignaciones</Nav.Link>
           </Nav>
           <Button variant="outline-light" onClick={doLogout}>

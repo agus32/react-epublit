@@ -10,6 +10,7 @@ import { PutLibro, GetLibro,PutPersonaLibro, DeletePersonFromBook,PostPeopleLibr
 import Modal from "react-bootstrap/Modal";
 import { ModalPersonaExistente, ModalNuevaPersona } from "./NuevoLibro";
 import Swal from "sweetalert2";
+import { formatDate } from "../utils";
 
 const ListaLibros = ({ libros, people, setLibros }) => {
   const [filterText, setFilterText] = useState("");
@@ -92,68 +93,81 @@ const ExpandedComponent = ({ data, people }) => {
     }
   };
 
-  const HandleExistentePush = (person) => {
-    const personPost = JSON.stringify({
-      id: person.id,
+  const HandleExistentePush = async (person) => {
+    const personPost = {
+      id_persona: person.id,
       porcentaje: person.porcentaje,
       tipo: person.tipo,
-    });
+    };
 
-    PostPeopleLibro({ people: personPost, isbn: data.isbn });
-
-    setLibro({ ...libro, ilustradores: [...libro.ilustradores, person] });
+    const response = await PostPeopleLibro({ people: personPost, isbn: data.isbn });
+    if(response.success){
+      person.id_persona = person.id;
+      person.tipo === "autor"
+        ? setLibro({ ...libro, autores: [...libro.autores, person] })
+        : setLibro({ ...libro, ilustradores: [...libro.ilustradores, person] });
+    }
   };
   const HandleNuevoPush = async (person) => {
     const response = await PostPeople(person[1]);
-    PostPeopleLibro({
-      people: JSON.stringify({
-        id: response.data.id,
+    if(response.success){
+    const response2 = await PostPeopleLibro({
+      people:{
+        id_persona: response.data.id,
         porcentaje: person[1].porcentaje,
         tipo: person[0].tipo,
-      }),
+      },
       isbn: data.isbn,
     });
-    person[1].id = response.data.id;
+    if(response2.success){
+    person[1].id_persona = response.data.id;
     person[1].tipo = person[0].tipo;
-    setLibro({ ...libro, ilustradores: [...libro.ilustradores, person[1]] });
+    person[0].tipo === "autor"
+      ? setLibro({ ...libro, autores: [...libro.autores, person[1]] })
+      : setLibro({ ...libro, ilustradores: [...libro.ilustradores, person[1]] });
+    }
+  }
   };
   const handlePorcentaje = async ({ porcentaje, id, tipo }) => {
     const response = await PutPersonaLibro({
-      persona: JSON.stringify({ porcentaje: porcentaje, id: id, tipo: tipo }),
+      persona:{ porcentaje: porcentaje, id_persona: id, tipo: tipo },
       isbn: data.isbn,
     });
     if (response.success) {
-      tipo === 0
+      console.log("success");
+      tipo === "autor"
         ? setLibro({
             ...libro,
             autores: libro.autores.map((autor) =>
-              autor.id === id ? { ...autor, porcentaje: porcentaje } : autor
+              autor.id_persona === id ? { ...autor, porcentaje: porcentaje } : autor
             ),
           })
         : setLibro({
             ...libro,
             ilustradores: libro.ilustradores.map((ilustrador) =>
-              ilustrador.id === id
+              ilustrador.id_persona === id
                 ? { ...ilustrador, porcentaje: porcentaje }
                 : ilustrador
             ),
           });
     }
   };
-  const handleDelete = ({ isbn, id, type }) => {
-    DeletePersonFromBook({ isbn, id, type });
+  const handleDelete = async ({ isbn, id, type }) => {
+    const response = await DeletePersonFromBook({ isbn, id, type });
 
-    type === 0
+    if(response.success){
+    type === "autor"
       ? setLibro({
           ...libro,
-          autores: libro.autores.filter((autor) => autor.id !== id),
+          autores: libro.autores.filter((autor) => autor.id_persona !== id),
         })
       : setLibro({
           ...libro,
           ilustradores: libro.ilustradores.filter(
-            (ilustrador) => ilustrador.id !== id
+            (ilustrador) => ilustrador.id_persona !== id
           ),
         });
+    }
   };
 
   if (loading) {
@@ -177,16 +191,16 @@ const ExpandedComponent = ({ data, people }) => {
                         onClick={() =>
                           handleDelete({
                             isbn: data.isbn,
-                            id: autor.id,
-                            type: 0,
+                            id: autor.id_persona,
+                            type: "autor",
                           })
                         }
                       />
                       <ModalEdit
                         handlePorcentaje={handlePorcentaje}
                         porcentajeInicial={autor.porcentaje}
-                        id={autor.id}
-                        tipo={0}
+                        id={autor.id_persona}
+                        tipo={"autor"}
                       />
                     </ListGroup.Item>
                   );
@@ -201,7 +215,7 @@ const ExpandedComponent = ({ data, people }) => {
                   <ModalNuevaPersona
                     type="Autor"
                     setPerson={HandleNuevoPush}
-                    person={[{ tipo: 0 }]}
+                    person={[{ tipo: "autor" }]}
                   />
                 </ListGroup.Item>
               </ListGroup>
@@ -221,16 +235,16 @@ const ExpandedComponent = ({ data, people }) => {
                       onClick={() =>
                         handleDelete({
                           isbn: data.isbn,
-                          id: ilustrador.id,
-                          type: 1,
+                          id: ilustrador.id_persona,
+                          type: "ilustrador",
                         })
                       }
                     />
                     <ModalEdit
                       handlePorcentaje={handlePorcentaje}
                       porcentajeInicial={ilustrador.porcentaje}
-                      id={ilustrador.id}
-                      tipo={1}
+                      id={ilustrador.id_persona}
+                      tipo={"ilustrador"}
                     />
                   </ListGroup.Item>
                 );
@@ -244,7 +258,7 @@ const ExpandedComponent = ({ data, people }) => {
                 <ModalNuevaPersona
                   type="Ilustrador"
                   setPerson={HandleNuevoPush}
-                  person={[{ tipo: 1 }]}
+                  person={[{ tipo: "ilustrador" }]}
                 />
               </ListGroup.Item>
             </ListGroup>
@@ -358,14 +372,7 @@ const columns = (handleButtonClick) => [
   },
 ];
 
-export function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear().toString();
 
-  return `${day}/${month}/${year}`;
-}
 
 const ModalEditLibro = ({ libro, show, setShow, setLibros, libros }) => {
   const isbn = libro.isbn;
@@ -374,12 +381,12 @@ const ModalEditLibro = ({ libro, show, setShow, setLibros, libros }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const edit = JSON.stringify({
+    const edit = {
       titulo: event.target.titulo.value,
       fecha_edicion: event.target["fecha-edicion"].value,
       precio: parseFloat(event.target.precio.value),
       stock: parseInt(event.target.stock.value),
-    });
+    };
     handleClose();
     const response = await PutLibro({ edit, isbn });
 

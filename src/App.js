@@ -15,7 +15,11 @@ import { ShowConsignaciones } from "./components/consignaciones/Consignaciones";
 
 const Home = () => (
   <div className="bdy">
-    <span className="title">Epublit</span>
+    <img
+      alt="epublit logo"
+      src={require("./media/epublit_logo.png")}
+      className="img-fluid mx-auto d-block"
+    />
   </div>
 );
 
