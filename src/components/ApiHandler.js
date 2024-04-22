@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-const HOST = "http://epublit.com.ar/api/v1";
+const HOST = "https://epublit.com.ar/api/v1";
 
 
 
