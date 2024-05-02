@@ -80,7 +80,8 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
     <div className="container mt-3">
       <Form onSubmit={handleSubmit}>
         <Row className="mb-3 mt-3">
-          <Form.Group as={Col} controlId="cliente">
+        <Col sm>
+          <Form.Group className="mb-3" controlId="cliente">
             <Form.Label>Cliente</Form.Label>
             <Form.Select>
               {Clientes.map((client) => (
@@ -90,7 +91,9 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
               ))}
             </Form.Select>
           </Form.Group>
-          <Form.Group as={Col} controlId="descuento">
+        </Col>
+        <Col sm>
+          <Form.Group className="mb-3" controlId="descuento">
             <Form.Label>Descuento</Form.Label>
             <Form.Control
               type="number"
@@ -100,8 +103,9 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
               placeholder="0.00"
             />
           </Form.Group>
-
-          <Form.Group as={Col} controlId="medio_pago">
+        </Col>
+        <Col sm>
+          <Form.Group className="mb-3" controlId="medio_pago">
             <Form.Label>Medio de Pago</Form.Label>
             <Form.Select defaultValue="Choose...">
               {medioPago.map((medio, index) => (
@@ -111,7 +115,9 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
               ))}
             </Form.Select>
           </Form.Group>
-          <Form.Group as={Col} controlId="tipo_cbte">
+          </Col>
+          <Col sm>
+          <Form.Group controlId="tipo_cbte">
             <Form.Label>Tipo de Factura</Form.Label>
             <Form.Select>
               <option key={1} value={1} disabled>
@@ -128,6 +134,7 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
               </option>
             </Form.Select>
           </Form.Group>
+        </Col>
         </Row>
 
         <h4>Libros</h4>

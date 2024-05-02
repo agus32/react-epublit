@@ -74,7 +74,7 @@ export const ConsignacionesForm = ({ clientes, libros }) => {
     <div className="container mt-3">
       <h2 className="mb-4"> Alta de consignaciones</h2>
       <Form onSubmit={handleSubmit}>
-        <Col xs={4} className="mb-4">
+        <Col xs={8} className="mb-4">
           <Form.Group controlId="cliente">
             <h4>Cliente</h4>
             <Form.Select>

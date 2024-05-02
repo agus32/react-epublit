@@ -45,7 +45,7 @@ export const NavBar = () => {
             <Nav.Link href="consignaciones">Consignaciones</Nav.Link>
           </Nav>
           <Button variant="outline-light" onClick={doLogout}>
-            Logout
+            Cerrar Sesión
           </Button>
         </Navbar.Collapse>
       </Container>
