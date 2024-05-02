@@ -134,7 +134,6 @@ const ExpandedComponent = ({ data, people }) => {
       isbn: data.isbn,
     });
     if (response.success) {
-      console.log("success");
       tipo === "autor"
         ? setLibro({
             ...libro,

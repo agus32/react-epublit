@@ -65,7 +65,6 @@ export const ConsignacionesForm = ({ clientes, libros }) => {
     });
 
     PostConsignacion(parseInt(event.target.cliente.value),listaLibros);
-    console.log(listaLibros);
     event.target.reset();
     setLibrosSeleccionados([]);
   };

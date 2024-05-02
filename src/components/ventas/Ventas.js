@@ -63,7 +63,6 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
         cantidad: parseInt(libro.cantidad),
       };
     });
-    console.log(parseFloat(event.target.descuento.value));
     PostVenta(
       parseInt(event.target.cliente.value),
       parseFloat(event.target.descuento.value) || 0,
