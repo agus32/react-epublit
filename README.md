@@ -1,5 +1,5 @@
-# Libros Silvestres
-Esta es una aplicacion de react creada para un proyecto de gestion de una editorial llamada Libros Silvestres, usa la api de [@Lautarotetamusa](https://github.com/Lautarotetamusa)   ([Libros silvestres api](https://github.com/Lautarotetamusa/LibrosSilvestres)) .
+# Epublit
+Esta es una aplicacion de react creada para un proyecto de gestion de una editoriales llamada Epublit, usa la api de [@Lautarotetamusa](https://github.com/Lautarotetamusa)   ([Epublit backend](https://github.com/Lautarotetamusa/Epublit)) .
 
 ### Instalacion
 Para ejecutar la aplicacion deberan primero instalar npm.
@@ -11,9 +11,9 @@ Luego dentro de la carpeta donde tengan guardada la app ejecutar
 ```
 foo@bar:~$ npm install
 ```
-Por ultimo entrar a /src/components/ApiHandler.js y en la variable API_PORT poner el puerto donde esta corriendo el backend.
+Por ultimo entrar a /src/components/ApiHandler.js y en la variable HOST poner la direccion donde está levantada la api.
 ```javascript
-API_PORT = 3000;
+const HOST = "https://epublit.com.ar/api/v1";
 ```
 ### Uso
 para arrancar la app dirigirse a la carpeta donde este alojada y escribir:
