@@ -30,9 +30,7 @@ export const NavBar = () => {
               <NavDropdown.Item href="lista-libros">
                 Lista de Libros
               </NavDropdown.Item>
-            </NavDropdown>
-
-            <Nav.Link href="ventas">Ventas</Nav.Link>
+            </NavDropdown>         
             <Nav.Link href="clientes">Clientes</Nav.Link>
             <NavDropdown title="Personas" id="collasible-nav-dropdown">
               <NavDropdown.Item href="autores">
@@ -42,7 +40,15 @@ export const NavBar = () => {
                 Ilustradores
               </NavDropdown.Item>
             </NavDropdown>
-            <Nav.Link href="consignaciones">Consignaciones</Nav.Link>
+            <Nav.Link href="ventas">Ventas</Nav.Link>
+            <NavDropdown title="Consignaciones" id="collasible-nav-dropdown">
+              <NavDropdown.Item href="alta-consignacion">
+                Alta Consignación
+              </NavDropdown.Item>
+              <NavDropdown.Item href="baja-consignacion">
+                Baja Consignación
+              </NavDropdown.Item>
+            </NavDropdown>
           </Nav>
           <Button variant="outline-light" onClick={doLogout}>
             Cerrar Sesión

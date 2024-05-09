@@ -256,14 +256,14 @@ const ExpandedComponent = ({ data }) => {
     return (
       <div className="container">
         <h4>Ventas</h4>
+        {ventas.length === 0 ? <p>El cliente no tiene ventas</p> :
         <Table bordered hover size="sm">
           <thead>
             <tr>
-              <th className="align-middle text-center">ID</th>
+              <th className="align-middle text-center">Fecha</th>
               <th>Titulo</th>
               <th>Cantidad</th>
               <th>Precio</th>
-              <th>Fecha</th>
               <th>Total</th>
             </tr>
           </thead>
@@ -278,17 +278,11 @@ const ExpandedComponent = ({ data }) => {
                           className="align-middle text-center"
                           rowSpan={venta.libros.length}
                         >
-                          {venta.id}
+                          {formatDate(venta.fecha)}
                         </td>
                         <td>{libro.titulo}</td>
                         <td className="text-center"> {libro.cantidad}</td>
                         <td className="text-end">{libro.precio_venta}</td>
-                        <td
-                          className="text-center align-middle"
-                          rowSpan={venta.libros.length}
-                        >
-                          {formatDate(venta.fecha)}
-                        </td>
                         <td
                           className="text-end align-middle"
                           rowSpan={venta.libros.length}
@@ -310,7 +304,9 @@ const ExpandedComponent = ({ data }) => {
             ))}
           </tbody>
         </Table>
+        }
         <h4>Stock Consignado</h4>
+        {stock.length === 0 ? <p>El cliente no tiene stock consignado</p> : 
         <Table striped bordered hover size="sm">
           <thead>
             <tr>
@@ -329,6 +325,7 @@ const ExpandedComponent = ({ data }) => {
             ))}
           </tbody>
         </Table>
+        }
       </div>
     );
   }

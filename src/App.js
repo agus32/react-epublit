@@ -11,8 +11,8 @@ import { ListarLibros } from "./components/libros/ListaLibros";
 import { CrearLibro } from "./components/libros/NuevoLibro";
 import { ShowClientes } from "./components/clientes/Clientes";
 import { ShowVentas } from "./components/ventas/Ventas";
-import { ShowConsignaciones } from "./components/consignaciones/Consignaciones";
-
+import { AltaConsignaciones } from "./components/consignaciones/AltaConsignaciones";
+import { BajaConsignaciones } from "./components/consignaciones/BajaConsignaciones";
 const Home = () => (
   <div className="bdy">
     <img
@@ -47,7 +47,8 @@ const AppRender = () => {
       <Route path="/clientes" element={<ShowClientes />} />
       <Route path="/autores" element={<Autores />} />
       <Route path="/ilustradores" element={<Ilustradores />} />
-      <Route path="/consignaciones" element={<ShowConsignaciones />} />
+      <Route path="/alta-consignacion" element={<AltaConsignaciones />} />
+      <Route path="/baja-consignacion" element={<BajaConsignaciones />} />
     </Routes>
   </div>
   ); 

@@ -110,6 +110,10 @@ export const GetConsignaciones = async () => {
   return fetchData("consignacion", "GET");
 };
 
+export const GetClientesConsignacion = async () => {
+  return fetchData("cliente?stock=1", "GET");
+};
+
 export const GetConsignacionByID = async (id) => {
   return fetchData(`consignacion/${id}`, "GET");
 };
@@ -144,6 +148,14 @@ export const PostCliente = async (inputs) => {
 
 export const PostConsignacion = async (cliente,libros) => {
   return fetchData("consignacion", "POST", {cliente,libros});
+};
+
+export const PostVentaConsignacion = async (cliente,libros) => {
+  return fetchData("ventaConsignacion", "POST", {cliente,libros});
+};
+
+export const PostDevolucionConsignacion = async (cliente,libros) => {
+  return fetchData("devolucion", "POST", {cliente,libros});
 };
 
 export const DeletePersonFromBook = async ({ isbn, id, type }) => {

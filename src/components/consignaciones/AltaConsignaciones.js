@@ -5,7 +5,7 @@ import { formatDate } from "../utils";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
 
-export const ConsignacionesForm = ({ clientes, libros }) => {
+const ConsignacionesForm = ({ clientes, libros }) => {
   const [librosSeleccionados, setLibrosSeleccionados] = useState([]);
   const [inputs, setInputs] = useState({ libro: "", cantidad: "" });
 
@@ -292,7 +292,7 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => (
   </InputGroup>
 );
 
-export const ShowConsignaciones = () => {
+export const AltaConsignaciones = () => {
   const [clientes, setClientes] = useState([]);
   const fetchClientes = async () => {
     const data = await GetClientes();
