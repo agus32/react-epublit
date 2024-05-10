@@ -20,32 +20,28 @@ const ConsignacionesForm = () => {
     getClientes();
   }, []);
 
-  useEffect(() => {
-    console.log(libros);
-  }, [libros.length]);
 
-
-  const getLibros = async () => {
-    if(clienteSeleccionado != -1){
-        const response = await GetStockById(clienteSeleccionado);
-        setLibros(response);
-    }
-  }
+  
   useEffect(() => {
+    const getLibros = async () => {
+      if(parseInt(clienteSeleccionado) !== -1){
+          const response = await GetStockById(clienteSeleccionado);
+          setLibros(response);
+      }
+    };
     getLibros();
-    console.log(clienteSeleccionado);
   }, [clienteSeleccionado]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(clienteSeleccionado == -1 || librosSeleccionados.length == 0 || tipoBaja == "0"){
+    if(parseInt(clienteSeleccionado) !== -1 || librosSeleccionados.length === 0 || tipoBaja === "0"){
       Swal.fire({
         title: "Advertencia",
         text: "Debe completar todos los campos",
         icon: "warning",
       });
     }else{
-      if(tipoBaja == "venta"){
+      if(tipoBaja === "venta"){
         PostVentaConsignacion(parseInt(clienteSeleccionado),librosSeleccionados);
       }else{
         PostDevolucionConsignacion(parseInt(clienteSeleccionado),librosSeleccionados);
@@ -153,7 +149,7 @@ const ConsignacionesForm = () => {
               name="isbn"
               onChange={handleChange}
             >
-              {clienteSeleccionado == -1 ? <option value="">Seleccione un cliente</option> : <option value="">Seleccione un libro</option>}
+              {parseInt(clienteSeleccionado) === -1 ? <option value="">Seleccione un cliente</option> : <option value="">Seleccione un libro</option>}
               {libros.map((libro) => (
                 <option key={libro.isbn} value={libro.isbn}>
                   {libro.titulo} ({libro.stock})
