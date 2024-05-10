@@ -34,7 +34,7 @@ const ConsignacionesForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(parseInt(clienteSeleccionado) !== -1 || librosSeleccionados.length === 0 || tipoBaja === "0"){
+    if(parseInt(clienteSeleccionado) === -1 || librosSeleccionados.length === 0 || tipoBaja === "0"){
       Swal.fire({
         title: "Advertencia",
         text: "Debe completar todos los campos",
