@@ -27,7 +27,6 @@ const ConsignacionesForm = () => {
 
   const getLibros = async () => {
     if(clienteSeleccionado != -1){
-        setLibros([{isbn:1,titulo:"Cargando libros...",stock:0}]);
         const response = await GetStockById(clienteSeleccionado);
         setLibros(response);
     }
