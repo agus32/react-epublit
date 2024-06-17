@@ -282,7 +282,7 @@ const ExpandedComponent = ({ data }) => {
                         </td>
                         <td>{libro.titulo}</td>
                         <td className="text-center"> {libro.cantidad}</td>
-                        <td className="text-end">{libro.precio_venta}</td>
+                        <td className="text-end">{libro.precio}</td>
                         <td
                           className="text-end align-middle"
                           rowSpan={venta.libros.length}
@@ -295,7 +295,7 @@ const ExpandedComponent = ({ data }) => {
                       <>
                         <td>{libro.titulo}</td>
                         <td className="text-center">{libro.cantidad}</td>
-                        <td className="text-end">{libro.precio_venta}</td>
+                        <td className="text-end">{libro.precio}</td>
                       </>
                     )}
                   </tr>

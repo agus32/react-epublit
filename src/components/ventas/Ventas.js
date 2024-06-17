@@ -359,7 +359,7 @@ const ExpandedComponent = ({ data }) => {
                 <td>{fila.isbn}</td>
                 <td>{fila.titulo}</td>
                 <td>{fila.cantidad}</td>
-                <td>{fila.precio_venta}</td>
+                <td>{fila.precio}</td>
               </tr>
             ))}
           </tbody>
