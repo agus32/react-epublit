@@ -46,7 +46,7 @@ export const NavBar = () => {
                 Alta Consignación
               </NavDropdown.Item>
               <NavDropdown.Item href="baja-consignacion">
-                Baja Consignación
+                Devoluciones
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>

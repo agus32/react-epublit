@@ -181,10 +181,10 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
 
           {tipoVenta === "consignacion" && (
             <Row className="mb-3">
-              <Col sm>
+              <Col xs={6} sm>
                 <Form.Group className="mb-3" controlId="fecha_venta">
                   <Form.Label>Fecha de Venta</Form.Label>
-                  <Form.Control type="date" />
+                  <Form.Control type="date" defaultValue={today.toISOString().substr(0, 10)}/>
                 </Form.Group>
               </Col>
             </Row>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {Button,Col,Row,Form} from "react-bootstrap";
-import {GetClientesConsignacion,GetStockById,PostVentaConsignacion,PostDevolucionConsignacion} from "../ApiHandler";
+import {GetClientesConsignacion,GetStockById,PostDevolucionConsignacion} from "../ApiHandler";
 import Swal from "sweetalert2";
 
 const ConsignacionesForm = () => {
@@ -9,7 +9,6 @@ const ConsignacionesForm = () => {
   const[inputs, setInputs] = useState({isbn:"",cantidad:""});
   const[librosSeleccionados, setLibrosSeleccionados] = useState([]);
   const[clienteSeleccionado, setClienteSeleccionado] = useState(-1);
-  const [tipoBaja, setTipoBaja] = useState("0");
 
   const getClientes = async () => {
     const data = await GetClientesConsignacion();
@@ -34,21 +33,18 @@ const ConsignacionesForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(parseInt(clienteSeleccionado) === -1 || librosSeleccionados.length === 0 || tipoBaja === "0"){
+    if(parseInt(clienteSeleccionado) === -1 || librosSeleccionados.length === 0){
       Swal.fire({
         title: "Advertencia",
         text: "Debe completar todos los campos",
         icon: "warning",
       });
     }else{
-      if(tipoBaja === "venta"){
-        PostVentaConsignacion(parseInt(clienteSeleccionado),librosSeleccionados);
-      }else{
         PostDevolucionConsignacion(parseInt(clienteSeleccionado),librosSeleccionados);
       }
     e.target.reset();
     setLibrosSeleccionados([]);
-    }
+    
   }
 
   const handleChange = (event) => {
@@ -100,19 +96,9 @@ const ConsignacionesForm = () => {
 
   return (
     <div className="container mt-3">
-      <h2 className="mb-4"> Baja de consignaciones</h2>     
+      <h2 className="mb-4"> Devolución de libros consignados</h2>     
       <Form onSubmit={handleSubmit}>
       <Row className="mb-3 align-items-center">
-        <Col xs={8} className="mb-4">
-        <Form.Group controlId="tipo-baja">
-            <h4>Tipo de baja</h4>
-            <Form.Select value={tipoBaja} onChange={(e) => setTipoBaja(e.target.value)}>
-                <option value={"0"}>Seleccione el tipo de baja</option>
-                <option value={"venta"}>Venta</option>
-                <option value={"devolucion"}>Devolución</option>
-            </Form.Select>
-          </Form.Group>
-          </Col>
           <Col xs={8} className="mb-4">
           <Form.Group controlId="cliente">
             <h4>Cliente</h4>
