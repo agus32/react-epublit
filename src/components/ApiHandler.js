@@ -150,8 +150,8 @@ export const PostConsignacion = async (cliente,libros) => {
   return fetchData("consignacion", "POST", {cliente,libros});
 };
 
-export const PostVentaConsignacion = async (cliente,libros) => {
-  return fetchData("ventaConsignacion", "POST", {cliente,libros});
+export const PostVentaConsignacion = async (cliente,fecha_venta, descuento, medio_pago,tipo_cbte, libros) => {
+  return fetchData("ventaConsignacion", "POST", { cliente,fecha_venta, descuento, medio_pago,tipo_cbte, libros });
 };
 
 export const PostDevolucionConsignacion = async (cliente,libros) => {
@@ -177,4 +177,8 @@ export const DeletePerson = async (id) => {
 
 export const PostLogin = async (user) => {
   return fetchData("user/login", "POST", user);
+};
+
+export const ActaulizarListaPrecios = async (id) => {
+  return fetchData(`cliente/${id}/stock`, "PUT");
 };

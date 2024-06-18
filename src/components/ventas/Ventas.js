@@ -1,6 +1,6 @@
 import {Button,Col,Row,Form,Table,InputGroup,Spinner} from "react-bootstrap";
 import React, { useEffect, useState } from "react";
-import {PostVenta,GetVentaById,GetClientes,GetLibros,GetMedioPago,GetAllVentas} from "../ApiHandler";
+import {PostVenta,GetVentaById,GetClientes,GetLibros,GetMedioPago,GetAllVentas,GetStockById,PostVentaConsignacion} from "../ApiHandler";
 import { formatDate } from "../utils";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
@@ -8,11 +8,26 @@ import Swal from "sweetalert2";
 const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
   const [librosSeleccionados, setLibrosSeleccionados] = useState([]);
   const [inputs, setInputs] = useState({ libro: "", cantidad: "" });
+  const [tipoVenta, setTipoVenta] = useState("");
+  const [librosDisponibles, setLibrosDisponibles] = useState([]);
 
   const handleChange = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
+    const { name, value } = event.target;
     setInputs((values) => ({ ...values, [name]: value }));
+  };
+
+  const handleTipoVentaChange = (event) => {
+    setTipoVenta(event.target.value);
+    setLibrosSeleccionados([]);
+    setInputs({ libro: "", cantidad: "" });
+  };
+
+  const handleClienteChange = async (event) => {
+    const clienteId = event.target.value;
+    if (tipoVenta === "consignacion" && clienteId !== "") {
+      const librosConsignacion = await GetStockById(clienteId);
+      setLibrosDisponibles(librosConsignacion);
+    }
   };
 
   const handleSeleccionadoDelete = (isbn) => {
@@ -46,7 +61,7 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
           ...librosSeleccionados,
           {
             cantidad: parseInt(inputs.cantidad),
-            libro: libros.find((libro) => libro.isbn === inputs.libro),
+            libro: librosDisponibles.find((libro) => libro.isbn === inputs.libro),
           },
         ]);
       }
@@ -63,6 +78,7 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
         cantidad: parseInt(libro.cantidad),
       };
     });
+    if(tipoVenta === "firme"){
     PostVenta(
       parseInt(event.target.cliente.value),
       parseFloat(event.target.descuento.value) || 0,
@@ -70,6 +86,16 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
       parseInt(event.target.tipo_cbte.value),
       listaLibros
     );
+    }else{
+    PostVentaConsignacion(
+      parseInt(event.target.cliente.value),
+      event.target.fecha_venta.value,
+      parseFloat(event.target.descuento.value) || 0,
+      event.target.medio_pago.value,
+      parseInt(event.target.tipo_cbte.value),
+      listaLibros
+    );
+    }
     fetchVentas();
     event.target.reset();
     setLibrosSeleccionados([]);
@@ -77,152 +103,186 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
 
   return (
     <div className="container mt-3">
-      <Form onSubmit={handleSubmit}>
-        <Row className="mb-3 mt-3">
-        <Col sm>
-          <Form.Group className="mb-3" controlId="cliente">
-            <Form.Label>Cliente</Form.Label>
-            <Form.Select>
-              {Clientes.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.nombre}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col sm>
-          <Form.Group className="mb-3" controlId="descuento">
-            <Form.Label>Descuento</Form.Label>
-            <Form.Control
-              type="number"
-              min="0"
-              max="100"
-              step="0.01"
-              placeholder="0.00"
-            />
-          </Form.Group>
-        </Col>
-        <Col sm>
-          <Form.Group className="mb-3" controlId="medio_pago">
-            <Form.Label>Medio de Pago</Form.Label>
-            <Form.Select defaultValue="Choose...">
-              {medioPago.map((medio, index) => (
-                <option key={index} value={medio}>
-                  {medio}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+      <Form>
+        <Row className="mb-3">
+          <Col>
+            <Form.Group controlId="tipo_venta">
+              <Form.Label>Tipo de Venta</Form.Label>
+              <Form.Select value={tipoVenta} onChange={handleTipoVentaChange}>
+                <option value="">Seleccione tipo de venta</option>
+                <option value="firme">Venta en Firme</option>
+                <option value="consignacion">Venta sobre Consignación</option>
+              </Form.Select>
+            </Form.Group>
           </Col>
-          <Col sm>
-          <Form.Group controlId="tipo_cbte">
-            <Form.Label>Tipo de Factura</Form.Label>
-            <Form.Select>
-              <option key={1} value={1} disabled>
-                Factura A
-              </option>
-              <option key={6} value={6} disabled>
-                Factura B
-              </option>
-              <option key={11} value={11}>
-                Factura C
-              </option>
-              <option key={51} value={51} disabled>
-                Factura M
-              </option>
-            </Form.Select>
-          </Form.Group>
-        </Col>
         </Row>
+      </Form>
 
-        <h4>Libros</h4>
+      {tipoVenta && (
+        <Form onSubmit={handleSubmit}>
+          <Row className="mb-3 mt-3">
+            <Col sm>
+              <Form.Group className="mb-3" controlId="cliente">
+                <Form.Label>Cliente</Form.Label>
+                <Form.Select onChange={handleClienteChange}>
+                  <option value="">Seleccione un cliente</option>
+                  {Clientes.map((client) => (
+                    <option key={client.id} value={client.id}>
+                      {client.nombre}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col sm>
+              <Form.Group className="mb-3" controlId="descuento">
+                <Form.Label>Descuento</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </Form.Group>
+            </Col>
+            <Col sm>
+              <Form.Group className="mb-3" controlId="medio_pago">
+                <Form.Label>Medio de Pago</Form.Label>
+                <Form.Select defaultValue="Choose...">
+                  {medioPago.map((medio, index) => (
+                    <option key={index} value={medio}>
+                      {medio}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col sm>
+              <Form.Group controlId="tipo_cbte">
+                <Form.Label>Tipo de Factura</Form.Label>
+                <Form.Select>
+                  <option key={1} value={1} disabled>
+                    Factura A
+                  </option>
+                  <option key={6} value={6} disabled>
+                    Factura B
+                  </option>
+                  <option key={11} value={11}>
+                    Factura C
+                  </option>
+                  <option key={51} value={51} disabled>
+                    Factura M
+                  </option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
 
-        {librosSeleccionados.length !== 0 && (
-          <Table bordered hover size="sm">
-            <thead>
-              <tr>
-                <th >Título</th>
-                <th className="text-center">Cantidad</th>
-                <th className="text-end">Precio Unitario</th>
-                <th className="text-center">Eliminar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {librosSeleccionados.map((libro) => (
-                <tr key={libro.libro.isbn}>
-                  <td>{libro.libro.titulo}</td>
-                  <td className="text-center">{libro.cantidad}</td>
-                  <td className="text-end">{libro.libro.precio}</td>
-                  <td className="text-center">
-                    <button
-                      type="button"
-                      className="btn-close align-middle"
-                      aria-label="Close"
-                      onClick={() => handleSeleccionadoDelete(libro.libro.isbn)}
-                    />
+          {tipoVenta === "consignacion" && (
+            <Row className="mb-3">
+              <Col sm>
+                <Form.Group className="mb-3" controlId="fecha_venta">
+                  <Form.Label>Fecha de Venta</Form.Label>
+                  <Form.Control type="date" />
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
+
+          <h4>Libros</h4>
+
+          {librosSeleccionados.length !== 0 && (
+            <Table bordered hover size="sm">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th className="text-center">Cantidad</th>
+                  <th className="text-end">Precio Unitario</th>
+                  <th className="text-center">Eliminar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {librosSeleccionados.map((libro) => (
+                  <tr key={libro.libro.isbn}>
+                    <td>{libro.libro.titulo}</td>
+                    <td className="text-center">{libro.cantidad}</td>
+                    <td className="text-end">{libro.libro.precio}</td>
+                    <td className="text-center">
+                      <button
+                        type="button"
+                        className="btn-close align-middle"
+                        aria-label="Close"
+                        onClick={() => handleSeleccionadoDelete(libro.libro.isbn)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td>Total:</td>
+                  <td colSpan={3} className="text-start">
+                    {librosSeleccionados.reduce((total, libro) => {
+                      const cantidad = parseInt(libro.cantidad);
+                      const precioUnitario = libro.libro.precio;
+                      return total + cantidad * precioUnitario;
+                    }, 0)}
                   </td>
                 </tr>
-              ))}
-              <tr>
-                <td >Total:</td>
-                <td colSpan={3} className="text-start">
-                  {librosSeleccionados.reduce((total, libro) => {
-                    const cantidad = parseInt(libro.cantidad);
-                    const precioUnitario = libro.libro.precio;
-                    return total + cantidad * precioUnitario;
-                  }, 0)}
-                </td>
-              </tr>
-            </tbody>
-          </Table>
-        )}
+              </tbody>
+            </Table>
+          )}
 
-        <br />
+          <br />
 
-        <Row className="mb-3 align-items-center">
-          <Form.Group as={Col} controlId="libro">
-            <Form.Select
-              value={inputs.libro}
-              name="libro"
-              onChange={handleChange}
-            >
-              <option value="">Seleccione un libro</option>
-              {libros.map((libro) => (
-                <option key={libro.isbn} value={libro.isbn}>
-                  {libro.titulo} ({libro.stock})
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
+          <Row className="mb-3 align-items-center">
+            <Form.Group as={Col} controlId="libro">
+              <Form.Select
+                value={inputs.libro}
+                name="libro"
+                onChange={handleChange}
+              >
+                <option value="">Seleccione un libro</option>
+                {tipoVenta === "consignacion" ? librosDisponibles.map((libro) => (
+                  <option key={libro.isbn} value={libro.isbn}>
+                    {libro.titulo} ({libro.stock})
+                  </option>
+                )) : libros.map((libro) => (
+                  <option key={libro.isbn} value={libro.isbn}>
+                    {libro.titulo} ({libro.stock})
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
 
-          <Form.Group as={Col} controlId="cantidad">
-            <Form.Control
-              type="number"
-              placeholder="Cantidad"
-              name="cantidad"
-              value={inputs.cantidad || ""}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Col>
-            <Button
-              variant="outline-primary"
-              type="submit"
-              onClick={handleSeleccionadoAdd}
-            >
-              Agregar
-            </Button>
-          </Col>
-        </Row>
+            <Form.Group as={Col} controlId="cantidad">
+              <Form.Control
+                type="number"
+                placeholder="Cantidad"
+                name="cantidad"
+                value={inputs.cantidad || ""}
+                onChange={handleChange}
+              />
+            </Form.Group>
+            <Col>
+              <Button
+                variant="outline-primary"
+                type="submit"
+                onClick={handleSeleccionadoAdd}
+              >
+                Agregar
+              </Button>
+            </Col>
+          </Row>
 
-        <Button variant="primary" type="submit">
-          Enviar
-        </Button>
-      </Form>
+          <Button variant="primary" type="submit">
+            Enviar
+          </Button>
+        </Form>
+      )}
     </div>
   );
 };
+
 
 const Ventas = ({ Clientes, medioPago, libros, ventas, fetchVentas }) => {
   return (

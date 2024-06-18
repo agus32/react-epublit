@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { DeleteCliente, PutCliente, PostCliente,GetVentas,GetVentaById,GetStockById,GetClientes} from '../ApiHandler';
+import { DeleteCliente, PutCliente, PostCliente,GetVentas,GetVentaById,GetStockById,GetClientes,ActaulizarListaPrecios} from '../ApiHandler';
 import { Modal, Button, Form , InputGroup,Row,Col,Table, Spinner} from 'react-bootstrap';
 import { formatDate } from "../utils";
 
@@ -305,7 +305,12 @@ const ExpandedComponent = ({ data }) => {
           </tbody>
         </Table>
         }
+        <div className="mt-2 mb-2 d-flex flex-row justify-content-between">
         <h4>Stock Consignado</h4>
+        {stock.length !== 0 && <Button variant="primary" onClick={() => {ActaulizarListaPrecios(data.id);fetchVentas()}}>
+          Actualizar lista de precios
+        </Button>}
+        </div>
         {stock.length === 0 ? <p>El cliente no tiene stock consignado</p> : 
         <Table striped bordered hover size="sm">
           <thead>
@@ -313,6 +318,7 @@ const ExpandedComponent = ({ data }) => {
               <th>Titulo</th>
               <th>ISBN</th>
               <th>Stock</th>
+              <th className="text-end">Precio Unit.</th>
             </tr>
           </thead>
           <tbody>
@@ -321,6 +327,7 @@ const ExpandedComponent = ({ data }) => {
                 <td>{fila.titulo}</td>
                 <td>{fila.isbn}</td>
                 <td>{fila.stock}</td>
+                <td className="text-end">{fila.precio}</td>
               </tr>
             ))}
           </tbody>
