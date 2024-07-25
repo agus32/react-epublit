@@ -1,0 +1,38 @@
+name: Build and Deploy React App
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  CI-CD:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 21
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build React App
+        run: npm run build
+
+      - name: Add SSH Key to Agent
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SFTP_PRIVATE_KEY}}
+
+      - name: Deploy React App to Linux CentOS 7
+        run: |
+          echo "Current Working Directory: $(pwd)"
+          echo "Contents of the directory: $(ls -la)"
+          echo "Starting deployment....."
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.SFTP_SERVER }} "cd ${{ vars.FRONT_DIRECTORY }} && rm -rf * && exit"
+          scp -o StrictHostKeyChecking=no -r ./build/* root@${{ secrets.SFTP_SERVER }}:${{ vars.FRONT_DIRECTORY }}
+          echo "Deployment completed."
