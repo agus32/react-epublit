@@ -61,7 +61,9 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
           ...librosSeleccionados,
           {
             cantidad: parseInt(inputs.cantidad),
-            libro: librosDisponibles.find((libro) => libro.isbn === inputs.libro),
+            libro: tipoVenta === "firme" 
+              ? libros.find((libro) => libro.isbn === inputs.libro)
+              : librosDisponibles.find((libro) => libro.isbn === inputs.libro),
           },
         ]);
       }
@@ -184,7 +186,7 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
               <Col xs={6} sm>
                 <Form.Group className="mb-3" controlId="fecha_venta">
                   <Form.Label>Fecha de Venta</Form.Label>
-                  <Form.Control type="date" defaultValue={today.toISOString().substr(0, 10)}/>
+                  <Form.Control type="date" />
                 </Form.Group>
               </Col>
             </Row>
