@@ -31,9 +31,13 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Server via SCP
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy to Server via SCP with Password
         run: |
-            ssh root@${{ secrets.SSH_HOST }} "rm -rf /home/Epublit/front/*"
-            scp -r build/* root@${{ secrets.SSH_HOST }}:/home/Epublit/front/
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} "rm -rf /home/Epublit/front/*"
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -r build/* root@${{ secrets.SSH_HOST }}:/home/Epublit/front/
+
       - name: Set permissions
-        run: ssh root@${{ secrets.SSH_HOST }} "chmod -R 755 /home/Epublit/front"
+        run: sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} "chmod -R 755 /home/Epublit/front"
