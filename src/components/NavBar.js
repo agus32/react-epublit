@@ -25,7 +25,7 @@ export const NavBar = () => {
           <Nav className="me-auto">
             <NavDropdown title="Libros" id="collasible-nav-dropdown">
               <NavDropdown.Item href="nuevo-libro">
-                Nuevo Libro
+                PUTO
               </NavDropdown.Item>
               <NavDropdown.Item href="lista-libros">
                 Lista de Libros
