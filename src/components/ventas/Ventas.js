@@ -1,4 +1,5 @@
 import {Button,Col,Row,Form,Table,InputGroup,Spinner} from "react-bootstrap";
+import Select from 'react-select';
 import React, { useEffect, useState } from "react";
 import {PostVenta,GetVentaById,GetClientes,GetLibros,GetMedioPago,GetAllVentas,GetStockById,PostVentaConsignacion} from "../ApiHandler";
 import { formatDate } from "../utils";
@@ -10,6 +11,7 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
   const [inputs, setInputs] = useState({ libro: "", cantidad: "" });
   const [tipoVenta, setTipoVenta] = useState("");
   const [librosDisponibles, setLibrosDisponibles] = useState([]);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState("");
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -20,13 +22,19 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
     setTipoVenta(event.target.value);
     setLibrosSeleccionados([]);
     setInputs({ libro: "", cantidad: "" });
+    setClienteSeleccionado("");
+    setLibrosDisponibles([]);
   };
 
   const handleClienteChange = async (event) => {
     const clienteId = event.target.value;
+    setClienteSeleccionado(clienteId);
     if (tipoVenta === "consignacion" && clienteId !== "") {
+      // Se obtienen los libros disponibles para este cliente
       const librosConsignacion = await GetStockById(clienteId);
       setLibrosDisponibles(librosConsignacion);
+    } else {
+      setLibrosDisponibles([]);
     }
   };
 
@@ -36,72 +44,134 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
     );
   };
 
+
+  const handleLibroChange = (selectedOption) => {
+    setInputs((values) => ({
+      ...values,
+      libro: selectedOption ? selectedOption.value : "",
+    }));
+  };
+
   const handleSeleccionadoAdd = (event) => {
     event.preventDefault();
+
     if (inputs.cantidad === "" || inputs.libro === "") {
       Swal.fire({
         title: "Advertencia",
         text: "Debe completar todos los campos",
         icon: "warning",
       });
-    } else {
-      const existingBook = librosSeleccionados.find(
-        (item) => item.libro.isbn === inputs.libro
-      );
-  
-      if (existingBook) {
-        const updatedLibrosSeleccionados = librosSeleccionados.map((item) =>
-          item.libro.isbn === existingBook.libro.isbn
-            ? { ...item, cantidad: item.cantidad + parseInt(inputs.cantidad) }
-            : item
-        );
-        setLibrosSeleccionados(updatedLibrosSeleccionados);
-      } else {
-        setLibrosSeleccionados([
-          ...librosSeleccionados,
-          {
-            cantidad: parseInt(inputs.cantidad),
-            libro: tipoVenta === "firme" 
-              ? libros.find((libro) => libro.isbn === inputs.libro)
-              : librosDisponibles.find((libro) => libro.isbn === inputs.libro),
-          },
-        ]);
-      }
-
-      setInputs({ libro: "", cantidad: "" });
+      return;
     }
+
+    const selectedBook =
+      tipoVenta === "firme"
+        ? libros.find((libro) => libro.isbn === inputs.libro)
+        : librosDisponibles.find((libro) => libro.isbn === inputs.libro);
+
+    if (!selectedBook) {
+      Swal.fire({
+        title: "Error",
+        text: "El libro seleccionado no se encuentra disponible",
+        icon: "error",
+      });
+      return;
+    }
+
+    const newQuantity = parseInt(inputs.cantidad, 10);
+    const existingBook = librosSeleccionados.find(
+      (item) => item.libro.isbn === selectedBook.isbn
+    );
+
+    // Validamos que la suma de la cantidad no supere el stock del libro
+    if (existingBook) {
+      if (existingBook.cantidad + newQuantity > selectedBook.stock) {
+        Swal.fire({
+          title: "Error",
+          text: "No puede agregar más libros que el stock disponible",
+          icon: "error",
+        });
+        return;
+      }
+    } else {
+      if (newQuantity > selectedBook.stock) {
+        Swal.fire({
+          title: "Error",
+          text: "La cantidad supera el stock disponible",
+          icon: "error",
+        });
+        return;
+      }
+    }
+
+    if (existingBook) {
+      const updatedLibrosSeleccionados = librosSeleccionados.map((item) =>
+        item.libro.isbn === selectedBook.isbn
+          ? { ...item, cantidad: item.cantidad + newQuantity }
+          : item
+      );
+      setLibrosSeleccionados(updatedLibrosSeleccionados);
+    } else {
+      setLibrosSeleccionados([
+        ...librosSeleccionados,
+        { cantidad: newQuantity, libro: selectedBook },
+      ]);
+    }
+
+    setInputs({ libro: "", cantidad: "" });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
-    const listaLibros = librosSeleccionados.map((libro) => {
-      return {
-        isbn: libro.libro.isbn,
-        cantidad: parseInt(libro.cantidad),
-      };
-    });
-    if(tipoVenta === "firme"){
-    PostVenta(
-      parseInt(event.target.cliente.value),
-      parseFloat(event.target.descuento.value) || 0,
-      event.target.medio_pago.value,
-      parseInt(event.target.tipo_cbte.value),
-      listaLibros
-    );
-    }else{
-    PostVentaConsignacion(
-      parseInt(event.target.cliente.value),
-      event.target.fecha_venta.value,
-      parseFloat(event.target.descuento.value) || 0,
-      event.target.medio_pago.value,
-      parseInt(event.target.tipo_cbte.value),
-      listaLibros
-    );
+
+    const listaLibros = librosSeleccionados.map((item) => ({
+      isbn: item.libro.isbn,
+      cantidad: parseInt(item.cantidad, 10),
+    }));
+
+    if (tipoVenta === "firme") {
+      const response = await PostVenta(
+        parseInt(event.target.cliente.value, 10),
+        parseFloat(event.target.descuento.value) || 0,
+        event.target.medio_pago.value,
+        parseInt(event.target.tipo_cbte.value, 10),
+        listaLibros
+      );
+      if(!response.success) return; 
+    } else {
+      const response = await PostVentaConsignacion(
+        parseInt(event.target.cliente.value, 10),
+        event.target.fecha_venta.value,
+        parseFloat(event.target.descuento.value) || 0,
+        event.target.medio_pago.value,
+        parseInt(event.target.tipo_cbte.value, 10),
+        listaLibros
+      );
+      if(!response.success) return; 
     }
     fetchVentas();
     event.target.reset();
     setLibrosSeleccionados([]);
   };
+
+  const librosOptions =
+    tipoVenta === "consignacion"
+      ? clienteSeleccionado
+        ? librosDisponibles
+            .filter((libro) => libro.stock > 0)
+            .map((libro) => ({
+              value: libro.isbn,
+              label: `${libro.titulo} (${libro.stock})`,
+              stock: libro.stock,
+            }))
+        : []
+      : libros
+          .filter((libro) => libro.stock > 0)
+          .map((libro) => ({
+            value: libro.isbn,
+            label: `${libro.titulo} (${libro.stock})`,
+            stock: libro.stock,
+          }));
 
   return (
     <div className="container mt-3">
@@ -205,17 +275,17 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
                 </tr>
               </thead>
               <tbody>
-                {librosSeleccionados.map((libro) => (
-                  <tr key={libro.libro.isbn}>
-                    <td>{libro.libro.titulo}</td>
-                    <td className="text-center">{libro.cantidad}</td>
-                    <td className="text-end">{libro.libro.precio}</td>
+                {librosSeleccionados.map((item) => (
+                  <tr key={item.libro.isbn}>
+                    <td>{item.libro.titulo}</td>
+                    <td className="text-center">{item.cantidad}</td>
+                    <td className="text-end">{item.libro.precio}</td>
                     <td className="text-center">
                       <button
                         type="button"
                         className="btn-close align-middle"
                         aria-label="Close"
-                        onClick={() => handleSeleccionadoDelete(libro.libro.isbn)}
+                        onClick={() => handleSeleccionadoDelete(item.libro.isbn)}
                       />
                     </td>
                   </tr>
@@ -223,9 +293,9 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
                 <tr>
                   <td>Total:</td>
                   <td colSpan={3} className="text-start">
-                    {librosSeleccionados.reduce((total, libro) => {
-                      const cantidad = parseInt(libro.cantidad);
-                      const precioUnitario = libro.libro.precio;
+                    {librosSeleccionados.reduce((total, item) => {
+                      const cantidad = parseInt(item.cantidad, 10);
+                      const precioUnitario = item.libro.precio;
                       return total + cantidad * precioUnitario;
                     }, 0)}
                   </td>
@@ -238,22 +308,20 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
 
           <Row className="mb-3 align-items-center">
             <Form.Group as={Col} controlId="libro">
-              <Form.Select
-                value={inputs.libro}
-                name="libro"
-                onChange={handleChange}
-              >
-                <option value="">Seleccione un libro</option>
-                {tipoVenta === "consignacion" ? librosDisponibles.map((libro) => (
-                  <option key={libro.isbn} value={libro.isbn}>
-                    {libro.titulo} ({libro.stock})
-                  </option>
-                )) : libros.map((libro) => (
-                  <option key={libro.isbn} value={libro.isbn}>
-                    {libro.titulo} ({libro.stock})
-                  </option>
-                ))}
-              </Form.Select>
+              <Select
+                options={librosOptions}
+                value={
+                  librosOptions.find((option) => option.value === inputs.libro) ||
+                  null
+                }
+                onChange={handleLibroChange}
+                placeholder={
+                  tipoVenta === "consignacion" && !clienteSeleccionado
+                    ? "Seleccione un cliente"
+                    : "Seleccione un libro"
+                }
+                isDisabled={tipoVenta === "consignacion" && !clienteSeleccionado}
+              />
             </Form.Group>
 
             <Form.Group as={Col} controlId="cantidad">
@@ -268,7 +336,7 @@ const AltaVenta = ({ Clientes, medioPago, libros, fetchVentas }) => {
             <Col>
               <Button
                 variant="outline-primary"
-                type="submit"
+                type="button"
                 onClick={handleSeleccionadoAdd}
               >
                 Agregar
