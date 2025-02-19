@@ -269,7 +269,7 @@ const ExpandedComponent = ({ data }) => {
             ))}
           </tbody>
         </Table>
-        <Button variant="success" onClick={() => window.open(consignacion.remito_path, "_blank")}>
+        <Button variant="success" onClick={() => window.open(consignacion.file_path, "_blank")}>
           Remito
         </Button>
       </div>
