@@ -416,8 +416,8 @@ const ListaVentas = ({ ventas }) => {
 
 const columns = [
   {
-    name: "ID",
-    selector: (row) => row.id,
+    name: "Tipo Venta",
+    selector: (row) => row.type === "venta" ? "En Firme" : "Sobre Consignado",
     sortable: true,
   },
   {
