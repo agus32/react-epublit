@@ -4,6 +4,7 @@ import {PostConsignacion,GetConsignacionByID,GetClientes,GetLibros,GetConsignaci
 import { formatDate } from "../utils";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
+import Select from 'react-select';
 
 const ConsignacionesForm = ({ clientes, libros }) => {
   const [librosSeleccionados, setLibrosSeleccionados] = useState([]);
@@ -13,6 +14,13 @@ const ConsignacionesForm = ({ clientes, libros }) => {
     const name = event.target.name;
     const value = event.target.value;
     setInputs((values) => ({ ...values, [name]: value }));
+  };
+
+  const handleLibroChange = (selectedOption) => {
+    setInputs((values) => ({
+      ...values,
+      libro: selectedOption ? selectedOption.value : "",
+    }));
   };
 
   const handleSeleccionadoDelete = (isbn) => {
@@ -29,11 +37,42 @@ const ConsignacionesForm = ({ clientes, libros }) => {
         text: "Debe completar todos los campos",
         icon: "warning",
       });
-    } else {
-      const existingBook = librosSeleccionados.find(
-        (item) => item.libro.isbn === inputs.libro
-      );
-  
+      return;
+    }
+    const selectedBook = libros.find((libro) => libro.isbn === inputs.libro)
+    if (!selectedBook) {
+      Swal.fire({
+        title: "Error",
+        text: "El libro seleccionado no se encuentra disponible",
+        icon: "error",
+      });
+      return;
+    }
+
+    const newQuantity = parseInt(inputs.cantidad, 10);
+    const existingBook = librosSeleccionados.find(
+      (item) => item.libro.isbn === selectedBook.isbn
+    );
+      
+      if (existingBook) {
+            if (existingBook.cantidad + newQuantity > selectedBook.stock) {
+              Swal.fire({
+                title: "Error",
+                text: "No puede agregar más libros que el stock disponible",
+                icon: "error",
+              });
+              return;
+            }
+          } else {
+            if (newQuantity > selectedBook.stock) {
+              Swal.fire({
+                title: "Error",
+                text: "La cantidad supera el stock disponible",
+                icon: "error",
+              });
+              return;
+            }
+          }
       if (existingBook) {
         const updatedLibrosSeleccionados = librosSeleccionados.map((item) =>
           item.libro.isbn === existingBook.libro.isbn
@@ -52,8 +91,16 @@ const ConsignacionesForm = ({ clientes, libros }) => {
       }
 
       setInputs({ libro: "", cantidad: "" });
-    }
+    
   };
+
+  const librosOptions = libros
+                          .filter((libro) => libro.stock > 0)
+                          .map((libro) => ({
+                            value: libro.isbn,
+                            label: `${libro.titulo} (${libro.stock})`,
+                            stock: libro.stock,
+                          }));  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -102,18 +149,16 @@ const ConsignacionesForm = ({ clientes, libros }) => {
 
         <Row className="mb-3 align-items-center">
           <Form.Group as={Col} controlId="libro">
-            <Form.Select
-              value={inputs.libro}
+            <Select
+              value={
+                librosOptions.find((option) => option.value === inputs.libro) ||
+                null
+              }
               name="libro"
-              onChange={handleChange}
-            >
-              <option value="">Seleccione un libro</option>
-              {libros.map((libro) => (
-                <option key={libro.isbn} value={libro.isbn}>
-                  {libro.titulo} ({libro.stock})
-                </option>
-              ))}
-            </Form.Select>
+              onChange={handleLibroChange}
+              options={librosOptions}
+              placeholder="Seleccione un libro..."
+            />
           </Form.Group>
 
           <Form.Group as={Col} controlId="cantidad">
@@ -144,14 +189,6 @@ const ConsignacionesForm = ({ clientes, libros }) => {
   );
 };
 
-const Consignaciones = ({ consignaciones, clientes, libros }) => {
-  return (
-    <div className="container mt-1">
-      <ConsignacionesForm clientes={clientes} libros={libros} />
-      <ListaConsignaciones consignaciones={consignaciones} />
-    </div>
-  );
-};
 
 const ListaConsignaciones = ({ consignaciones }) => {
   const [filterText, setFilterText] = useState("");
@@ -318,10 +355,9 @@ export const AltaConsignaciones = () => {
   }, []);
 
   return (
-    <Consignaciones
-      consignaciones={consignaciones}
-      clientes={clientes}
-      libros={libros}
-    />
+    <div className="container mt-10">
+      <ConsignacionesForm clientes={clientes} libros={libros} />
+      <ListaConsignaciones consignaciones={consignaciones} />
+    </div>
   );
 };
