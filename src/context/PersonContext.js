@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { PostLogin, setToken } from "../components/ApiHandler";
+import Swal from "sweetalert2";
 
 const PersonContext = createContext();
 
@@ -12,6 +13,22 @@ export const PersonProvider = ({ children }) => {
       const loggedUser = await localStorage.getItem("loggedUser");
       if (loggedUser) {
         const parsedUser = JSON.parse(loggedUser);
+        const isTokenExpired = (token) => {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.exp * 1000 < Date.now();     
+        };
+
+        if (isTokenExpired(parsedUser.token)) {
+            Swal.fire({
+            title: "Sesión expirada",
+            text: "Por favor, inicie sesión nuevamente.",
+            icon: "warning",
+            confirmButtonText: "OK",
+            });
+          localStorage.removeItem("loggedUser");
+          setLoading(false);
+          return;
+        }
         setUser(parsedUser);
         setToken(parsedUser.token);
       }
