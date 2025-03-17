@@ -5,6 +5,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { usePerson } from "../context/PersonContext";
+import { UserIcon } from "./utils";
 
 export const NavBar = () => {
   const { doLogout } = usePerson();
@@ -50,9 +51,11 @@ export const NavBar = () => {
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
-          <Button variant="outline-light" onClick={doLogout}>
-            Cerrar Sesión
-          </Button>
+          <Nav className="ms-auto"> 
+            <Nav.Link href="/perfil">
+              👤
+            </Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>
