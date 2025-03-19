@@ -14,6 +14,8 @@ import { ShowVentas } from "./components/ventas/Ventas";
 import { AltaConsignaciones } from "./components/consignaciones/AltaConsignaciones";
 import { BajaConsignaciones } from "./components/consignaciones/BajaConsignaciones";
 import { Perfil } from "./components/personas/Perfil";
+import { Metricas } from "./components/Metricas";
+
 const Home = () => (
   <div className="bdy">
     <img
@@ -51,6 +53,7 @@ const AppRender = () => {
       <Route path="/alta-consignacion" element={<AltaConsignaciones />} />
       <Route path="/baja-consignacion" element={<BajaConsignaciones />} />
       <Route path="/perfil" element={<Perfil />} />
+      <Route path="/metricas" element={<Metricas />} />
     </Routes>
   </div>
   ); 

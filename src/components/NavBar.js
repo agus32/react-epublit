@@ -45,6 +45,7 @@ export const NavBar = () => {
                 Devoluciones
               </NavDropdown.Item>
             </NavDropdown>
+            <Nav.Link href="metricas">Métricas</Nav.Link>
           </Nav>
           <Nav className="ms-auto"> 
             <Nav.Link href="/perfil">
