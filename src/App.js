@@ -1,8 +1,9 @@
 import { NavBar } from "./components/NavBar";
-import "./App.css";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { Login } from "./components/login/Login";
+import { LoginForm } from "./components/login/LoginForm";
+import { RegisterForm } from "./components/login/RegisterForm";
 import { Spinner } from "react-bootstrap";
 import { PersonProvider, usePerson } from "./context/PersonContext";
 import { Autores } from "./components/personas/Autores";
@@ -15,16 +16,8 @@ import { AltaConsignaciones } from "./components/consignaciones/AltaConsignacion
 import { BajaConsignaciones } from "./components/consignaciones/BajaConsignaciones";
 import { Perfil } from "./components/personas/Perfil";
 import { Metricas } from "./components/Metricas";
+import { Home } from "./components/Home";
 
-const Home = () => (
-  <div className="bdy">
-    <img
-      alt="epublit logo"
-      src={require("./media/epublit_logo.png")}
-      className="img-fluid mx-auto d-block"
-    />
-  </div>
-);
 
 const AppRender = () => {
   const { user, loading } = usePerson();
@@ -36,7 +29,12 @@ const AppRender = () => {
   }
 
   if(Object.keys(user).length === 0){
-    return <Login />
+    return (
+      <Routes>
+        <Route path="/*" element={<Login Child={LoginForm}/>} />
+        <Route path="/register" element={<Login Child={RegisterForm}/>} />
+      </Routes>
+    )
   }
 
   return(

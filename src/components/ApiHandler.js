@@ -179,6 +179,10 @@ export const PostLogin = async (user) => {
   return fetchData("user/login", "POST", user);
 };
 
+export const PostUser = async (user) => {
+  return fetchData("user/register", "POST", user);
+};
+
 export const ActaulizarListaPrecios = async (id) => {
   return fetchData(`cliente/${id}/stock`, "PUT");
 };

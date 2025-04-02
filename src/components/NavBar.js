@@ -11,7 +11,7 @@ export const NavBar = () => {
         <Navbar.Brand href="/">
           <img
               alt="epublit logo"
-              src={require("../media/epublit_logo.png")}
+              src="/media/epublit_logo.png"
               height="35"
               className="d-inline-block align-top"
             />

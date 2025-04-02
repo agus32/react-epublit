@@ -23,7 +23,8 @@ export const LoginForm = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} style={{ width: "350px"}}>
+      <h1>Login</h1>
       <Form.Group className="mb-3">
         <Form.Label>Usuario</Form.Label>
         <Form.Control
@@ -47,6 +48,14 @@ export const LoginForm = () => {
       <Button variant="outline-light" type="submit">
         Enviar
       </Button>
+      <div style={{ textAlign: "right", marginTop: "10px" }}>
+        <a href="/register" style={{ color: "white", textDecoration: "none" }}>
+          ¿No tienes una cuenta? 
+        </a>{" "}
+        <a href="/register" style={{ color: "white" }}>
+           Regístrate
+        </a>
+      </div>
     </Form>
   );
 };
