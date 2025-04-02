@@ -1,24 +1,39 @@
 import React,{useState,useEffect} from 'react';
-import { GetUser } from '../ApiHandler';
+import { GetUser,PutUser } from '../ApiHandler';
 import { Card, Avatar, Button, Descriptions, Typography, Divider,Tag} from "antd";
 import { Spinner } from 'react-bootstrap';
 import { usePerson } from '../../context/PersonContext';
-import { LogoutOutlined, UserOutlined } from "@ant-design/icons"
+import { LogoutOutlined, UserOutlined,EditOutlined } from "@ant-design/icons"
+import { EditPerfil } from './EditPerfil.js';
 
 export const Perfil = () => {
     const { doLogout } = usePerson();
     const [user, setUser] = useState({});
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { Title } = Typography;
 
-    useEffect(() => {
-        const fetchLoggedUser = async () => {
-            const response = await GetUser();
-            setUser(response?.data);
-            setLoading(false);
-        };
+    const handleEditSave = async(values) => {
+      const edit = {
+        email: values.email ?? user.email,
+        punto_venta: values.punto_venta ?? user.punto_venta,
+      };
+      const response = await PutUser(edit, user.id);
+      if(response?.success){
         fetchLoggedUser();
+        setIsModalOpen(false);
+      }
+    };
+
+    const fetchLoggedUser = async () => {
+      const response = await GetUser();
+      setUser(response?.data);
+      setLoading(false);
+    };
+
+    useEffect(() => {
+      fetchLoggedUser();
     }
     , []);
 
@@ -33,16 +48,27 @@ export const Perfil = () => {
           className="shadow-sm p-4"
           actions={[
             <Button
-              key="logout"
-              type="primary"
-              danger
-              icon={<LogoutOutlined />}
-              onClick={doLogout}
+              key="edit"
+              color="blue"
+              variant="filled"
+              icon={<EditOutlined />}
+              onClick={() => setIsModalOpen(true)}
               size="large"
               
             >
-              Cerrar Sesión
+              Editar Perfil
             </Button>,
+            <Button
+            key="logout"
+            type="primary"
+            danger
+            icon={<LogoutOutlined />}
+            onClick={doLogout}
+            size="large"
+            
+          >
+            Cerrar Sesión
+          </Button>,
           ]}
         >
           <div className="d-flex flex-column flex-md-row align-items-center gap-3 mb-4">
@@ -78,9 +104,16 @@ export const Perfil = () => {
             <Descriptions.Item label="Domicilio" span={2}>
               <span className="text-secondary">{user.domicilio}</span>
             </Descriptions.Item>
+            <Descriptions.Item label="Email" span={2}>
+              <span className="text-secondary">{user.email || "-"}</span>
+            </Descriptions.Item>
+            <Descriptions.Item label="Punto de venta" span={2}>
+              <Tag color="blue">{user.punto_venta || "-"}</Tag>
+            </Descriptions.Item>
           </Descriptions>
         </Card>
       )}
+      <EditPerfil visible={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleEditSave} user={user} />
     </div>    
     );
 };

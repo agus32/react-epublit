@@ -86,6 +86,10 @@ export const PutLibro = async ({ edit, isbn }) => {
   return fetchData(`libro/${isbn}`, "PUT", edit);
 };
 
+export const PutUser = async ( edit, id ) => {
+  return fetchData(`user/${id}`, "PUT", edit);
+};
+
 export const PutCliente = async ({ edit, id }) => {
   return fetchData(`cliente/${id}`, "PUT", edit);
 };
