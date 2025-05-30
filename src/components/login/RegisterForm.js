@@ -15,13 +15,8 @@ export const RegisterForm = () => {
       cuit: formData.get("cuit"),
       email: formData.get("email"),
     };
-    const response = await PostUser(data);
+    await PostUser(data);
     setLoading(false);
-    if(response?.success){
-      window.location.href = "/";
-      formData.reset();
-    }
-    console.log(response);
   };
 
 
@@ -45,7 +40,7 @@ export const RegisterForm = () => {
         </Form.Group>
         
         <Form.Group className="mb-3">
-            <Form.Label>CUIT</Form.Label>
+            <Form.Label>CUIT (sin guiones o espacios)</Form.Label>
             <Form.Control type="text" name="cuit" placeholder="CUIT" required />
         </Form.Group>
         

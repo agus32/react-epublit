@@ -7,17 +7,17 @@ const { Content } = Layout;
 // Objeto de ejemplo
 const noticias = [
   {
-    titulo: 'Nueva colección de libros digitales',
-    fecha: '20 de marzo de 2025',
-    descripcion: 'Explorá nuestra nueva línea editorial enfocada en autores emergentes de Latinoamérica.',
-    autor: 'Editorial Epublit',
-  },
-  {
-    titulo: 'Lanzamos la app móvil',
-    fecha: '15 de marzo de 2025',
-    descripcion: 'Ahora podés leer tus libros favoritos desde cualquier lugar con nuestra nueva aplicación.',
+    titulo: 'Versión 1.0 de la plataforma Epublit',
+    fecha: '29 de mayo de 2025',
+    descripcion: 'Ahora podés editar tu perfil desde la sección perfil.',
     autor: 'Equipo de desarrollo',
   },
+  {
+    titulo: 'Nueva funcionalidad de búsqueda avanzada',
+    fecha: '27 de mayo de 2025',
+    descripcion: 'Ahora podés buscar libros por autor, título o género.',
+    autor: 'Equipo de desarrollo',
+  }
 ];
 
 export const Home = () => {
