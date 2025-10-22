@@ -52,6 +52,7 @@ const AppRender = () => {
       <Route path="/baja-consignacion" element={<BajaConsignaciones />} />
       <Route path="/perfil" element={<Perfil />} />
       <Route path="/metricas" element={<Metricas />} />
+      <Route path="/register" element={<Login Child={RegisterForm}/>} />
     </Routes>
   </div>
   ); 

@@ -1,10 +1,17 @@
-import React,{useState} from "react";
+import React,{useState, useEffect} from "react";
 import { Button, Form, Spinner} from "react-bootstrap";
 import {PostUser} from "../../components/ApiHandler";
+import { useNavigate } from "react-router-dom";
 
 export const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
+  useEffect(() => {
+    const loggedUser = localStorage.getItem("loggedUser") || localStorage.getItem("token");
+    if (loggedUser) {
+      navigate("/"); // Redirige al home
+    }
+  }, [navigate]);
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
@@ -15,7 +22,10 @@ export const RegisterForm = () => {
       cuit: formData.get("cuit"),
       email: formData.get("email"),
     };
-    await PostUser(data);
+    const response = await PostUser(data);
+    if(response.success){
+      navigate("/");
+    }
     setLoading(false);
   };
 
